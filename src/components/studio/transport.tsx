@@ -3,8 +3,6 @@ import { Download, Pause, Play, RefreshCw, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { saveCloudSet } from "@/lib/library";
-import { useCurrentUser } from "@/lib/auth/use-current-user";
 import { KEYS, type Bars, type Density, type ModeName } from "@/lib/music/types";
 import { STYLES } from "@/lib/music/styles";
 import { seedToHex } from "@/lib/music/rng";
@@ -23,7 +21,6 @@ export function Transport() {
   const applyParams = useStudio((s) => s.applyParams);
   const exportWav = useStudio((s) => s.exportWav);
   const saveLocal = useStudio((s) => s.saveLocal);
-  const user = useCurrentUser();
   const params = current.params;
 
   const copyLink = async () => {
@@ -37,12 +34,6 @@ export function Transport() {
 
   const persist = () => {
     saveLocal();
-    const latest = useStudio.getState().library[0];
-    if (user && latest) {
-      void saveCloudSet({ data: latest }).catch(() => {
-        /* duplicate or unsigned */
-      });
-    }
     toast("Set saved");
   };
 

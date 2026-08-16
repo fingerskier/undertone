@@ -256,7 +256,8 @@ export const useStudio = create<StudioStore>((set, get) => ({
       a.href = url;
       a.download = `${get().current.id}.wav`;
       a.click();
-      URL.revokeObjectURL(url);
+      // Revoking synchronously can cancel the download in some browsers.
+      window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
     } finally {
       set({ exporting: false });
     }
