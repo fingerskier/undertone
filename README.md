@@ -2,6 +2,8 @@
 
 A drum track, ambient pad, and bass-line set generator. One locked loop: kick through hats, a chord pad, and a bass line that sits on the kick.
 
+A pure client-side PWA — no server, no accounts. Everything runs on Web Audio in the browser, saved sets stay on the device, and it installs to the home screen and works offline.
+
 ## Rooms
 
 Night Drive · Warehouse · Dusk · Pulse · Fog · Ritual
@@ -22,10 +24,12 @@ npm run typecheck
 npm run build
 ```
 
-Sign-in (Google / X) is optional — generation works as a guest. Saved sets stay on the device; a signed-in account also keeps a cloud library.
-
 WAV export renders the current loop offline. Share copies a seed URL.
+
+## Deploy
+
+Pushes to `main` deploy to GitHub Pages via `.github/workflows/deploy.yml` (set the repository's Pages source to "GitHub Actions"). The build honors `BASE_PATH` for subdirectory hosting.
 
 ## Stack
 
-React 19, TanStack Start, Tailwind v4, Web Audio.
+React 19, Vite, Tailwind v4, Web Audio.

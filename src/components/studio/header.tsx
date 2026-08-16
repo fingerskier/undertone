@@ -1,8 +1,4 @@
-import { Library, UserRound } from "lucide-react";
-import { Link } from "@tanstack/react-router";
-import { SignedIn, SignedOut } from "@/lib/auth/gates";
-import { useCurrentUserState } from "@/lib/auth/use-current-user";
-import { signOut } from "@/lib/auth/client";
+import { Library } from "lucide-react";
 import { useStudio } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 
@@ -28,49 +24,7 @@ export function StudioHeader() {
           <Library />
           Library
         </Button>
-        <AuthSlot />
       </div>
     </header>
-  );
-}
-
-function AuthSlot() {
-  const { user, isPending } = useCurrentUserState();
-  if (isPending) {
-    return <div className="size-9 animate-pulse rounded-full bg-surface" />;
-  }
-  return (
-    <>
-      <SignedOut>
-        <Button asChild variant="outline" size="sm">
-          <Link to="/login">
-            <UserRound />
-            Sign in
-          </Link>
-        </Button>
-      </SignedOut>
-      <SignedIn>
-        <div className="flex items-center gap-2">
-          {user?.profileImageUrl ? (
-            <img
-              src={user.profileImageUrl}
-              alt=""
-              className="size-8 rounded-full object-cover outline outline-1 -outline-offset-1 outline-fg/10"
-            />
-          ) : (
-            <span className="grid size-8 place-items-center rounded-full bg-surface text-xs text-muted">
-              {(user?.displayName ?? "U").charAt(0).toUpperCase()}
-            </span>
-          )}
-          <button
-            type="button"
-            onClick={() => void signOut()}
-            className="hidden text-xs text-muted hover:text-fg sm:inline"
-          >
-            Sign out
-          </button>
-        </div>
-      </SignedIn>
-    </>
   );
 }

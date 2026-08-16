@@ -50,6 +50,7 @@ export class StudioEngine {
   private analyser: AnalyserNode | null = null;
 
   private timer: number | null = null;
+  private reverbDecay = -1;
   private nextNoteTime = 0;
   private currentStep = 0;
   private playing = false;
@@ -177,7 +178,12 @@ export class StudioEngine {
     const spb = 60 / set.params.bpm;
     this.delay.delayTime.setTargetAtTime(Math.min(1.8, set.mix.delayBeats * spb), ctx.currentTime, 0.05);
     this.delayGain.gain.setTargetAtTime(set.mix.delayMix, ctx.currentTime, 0.05);
-    this.reverb.buffer = makeImpulse(ctx, set.mix.reverbDecay);
+    // Impulse synthesis fills sampleRate*decay*2 samples — only rebuild when the
+    // decay actually changes, not on every load/slider tick.
+    if (set.mix.reverbDecay !== this.reverbDecay) {
+      this.reverbDecay = set.mix.reverbDecay;
+      this.reverb.buffer = makeImpulse(ctx, set.mix.reverbDecay);
+    }
   }
 
   async play(): Promise<void> {

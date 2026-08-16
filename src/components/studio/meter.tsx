@@ -12,6 +12,8 @@ export function MasterMeter() {
     const ctx2d = canvas.getContext("2d");
     if (!ctx2d) return;
     const freq = new Uint8Array(128);
+    const fg =
+      getComputedStyle(document.documentElement).getPropertyValue("--color-fg").trim() || "white";
 
     const draw = () => {
       const { width, height } = canvas;
@@ -25,18 +27,17 @@ export function MasterMeter() {
       const bars = 48;
       const gap = 2;
       const bw = (width - gap * (bars - 1)) / bars;
+      ctx2d.globalAlpha = playing ? 0.75 : 0.28;
+      ctx2d.fillStyle = fg;
       for (let i = 0; i < bars; i++) {
         const sample = freq[Math.floor((i / bars) * freq.length)] ?? 0;
         const idle = playing ? 4 : 2;
         const h = Math.max(idle, (sample / 255) * height * 0.92);
-        ctx2d.globalAlpha = playing ? 0.75 : 0.28;
-        ctx2d.fillStyle =
-          getComputedStyle(document.documentElement).getPropertyValue("--color-fg").trim() ||
-          "white";
         ctx2d.fillRect(i * (bw + gap), height - h, bw, h);
       }
       ctx2d.globalAlpha = 1;
-      frame = requestAnimationFrame(draw);
+      // Idle state is static — draw it once instead of burning a rAF loop.
+      if (playing) frame = requestAnimationFrame(draw);
     };
     let frame = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(frame);

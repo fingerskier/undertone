@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 import { Toaster } from "sonner";
-import { listCloudSets } from "@/lib/library";
-import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { type SearchParams, useStudio } from "@/lib/store";
 import { StudioHeader } from "./header";
 import { LibraryPanel, StemDeck } from "./stems";
@@ -12,22 +10,10 @@ export function StudioApp({ search }: { search: SearchParams }) {
   const togglePlay = useStudio((s) => s.togglePlay);
   const generate = useStudio((s) => s.generate);
   const stop = useStudio((s) => s.stop);
-  const setLibrary = useStudio((s) => s.setLibrary);
-  const { user } = useCurrentUserState();
 
   useEffect(() => {
     loadFromSearch(search);
-  }, [
-    loadFromSearch,
-    search.seed,
-    search.style,
-    search.key,
-    search.mode,
-    search.bpm,
-    search.bars,
-    search.swing,
-    search.density,
-  ]);
+  }, [loadFromSearch, search]);
 
   useEffect(() => {
     return () => stop();
@@ -35,8 +21,15 @@ export function StudioApp({ search }: { search: SearchParams }) {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
       const target = e.target as HTMLElement | null;
-      if (target && (target.tagName === "INPUT" || target.tagName === "SELECT" || target.tagName === "TEXTAREA")) {
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "SELECT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
         return;
       }
       if (e.code === "Space") {
@@ -51,19 +44,6 @@ export function StudioApp({ search }: { search: SearchParams }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [generate, togglePlay]);
-
-  useEffect(() => {
-    if (!user) return;
-    void listCloudSets()
-      .then((cloud) => {
-        const local = useStudio.getState().library;
-        const seen = new Set(cloud.map((s) => s.id));
-        setLibrary([...cloud, ...local.filter((s) => !seen.has(s.id))]);
-      })
-      .catch(() => {
-        /* guest or network */
-      });
-  }, [user, setLibrary]);
 
   return (
     <div className="min-h-dvh overflow-x-hidden bg-bg text-fg">

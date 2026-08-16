@@ -5,17 +5,10 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-/** Flat ESLint config for the TanStack Start app-builder template. */
+/** Flat ESLint config for the Undertone PWA. */
 export default tseslint.config(
   {
-    ignores: [
-      "dist/**",
-      ".output/**",
-      ".vercel/**",
-      ".nitro/**",
-      "node_modules/**",
-      "src/routeTree.gen.ts",
-    ],
+    ignores: ["dist/**", "node_modules/**", "public/sw.js"],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

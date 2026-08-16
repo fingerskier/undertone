@@ -260,7 +260,7 @@ export function LibraryPanel() {
       </div>
       {library.length === 0 ? (
         <p className="text-sm text-muted">
-          Saved sets stay on this device. Sign in to keep a cloud copy as well.
+          Nothing saved yet. Hit Save on the transport — sets stay on this device.
         </p>
       ) : (
         <ul className="space-y-2">
