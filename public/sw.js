@@ -3,7 +3,14 @@
  * them; the HTML shell is network-first so deploys roll out on the next load
  * while the app keeps working offline.
  */
-const VERSION = "v1";
+// Both placeholders are rewritten by the swPrecachePlugin in vite.config.ts:
+// VERSION becomes a hash of the emitted bundle names (so every deploy drops the
+// previous caches on activate) and PRECACHE_ASSETS becomes the hashed
+// assets/... files, which must be precached at install — registration happens
+// after window load, so the first page view fetches them before this worker
+// controls the page and a fetch-time cache would miss them.
+const VERSION = "dev";
+const PRECACHE_ASSETS = [];
 const SHELL_CACHE = `undertone-shell-${VERSION}`;
 const ASSET_CACHE = `undertone-assets-${VERSION}`;
 // Scope pathname is the deploy base ("/" locally, "/undertone/" on Pages).
@@ -19,10 +26,12 @@ const SHELL_URLS = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(SHELL_CACHE)
-      .then((cache) => cache.addAll(SHELL_URLS))
-      .then(() => self.skipWaiting()),
+    Promise.all([
+      caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL_URLS)),
+      caches
+        .open(ASSET_CACHE)
+        .then((cache) => cache.addAll(PRECACHE_ASSETS.map((path) => `${BASE}${path}`))),
+    ]).then(() => self.skipWaiting()),
   );
 });
 
